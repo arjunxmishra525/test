@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Catch the Falling Balls</title>
+
+<style>
+body{
+    margin:0;
+    background:#111;
+    overflow:hidden;
+    font-family:Arial;
+}
+
+canvas{
+    display:block;
+    margin:auto;
+    background:linear-gradient(#0b1d3a,#000);
+}
+</style>
+
+</head>
+<body>
+
+<canvas id="game"></canvas>
+
+<script>
+
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+
+canvas.width=500;
+canvas.height=700;
+
+let score=0;
+
+const player={
+x:220,
+y:650,
+w:80,
+h:20,
+speed:8
+};
+
+const keys={};
+
+document.addEventListener("keydown",e=>keys[e.key]=true);
+document.addEventListener("keyup",e=>keys[e.key]=false);
+
+const balls=[];
+
+function spawnBall(){
+
+balls.push({
+x:Math.random()*470,
+y:-20,
+r:10+Math.random()*10,
+speed:2+Math.random()*4
+});
+
+}
+
+setInterval(spawnBall,700);
+
+function update(){
+
+if(keys["ArrowLeft"])
+player.x-=player.speed;
+
+if(keys["ArrowRight"])
+player.x+=player.speed;
+
+if(player.x<0)player.x=0;
+if(player.x+player.w>canvas.width)
+player.x=canvas.width-player.w;
+
+for(let i=balls.length-1;i>=0;i--){
+
+balls[i].y+=balls[i].speed;
+
+if(
+balls[i].y+balls[i].r>=player.y &&
+balls[i].x>=player.x &&
+balls[i].x<=player.x+player.w
+){
+
+score++;
+balls.splice(i,1);
+continue;
+
+}
+
+if(balls[i].y>canvas.height){
+balls.splice(i,1);
+}
+
+}
+
+}
+
+function draw(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+ctx.fillStyle="white";
+ctx.font="24px Arial";
+ctx.fillText("Score : "+score,20,40);
+
+ctx.fillStyle="#00ff99";
+ctx.fillRect(player.x,player.y,player.w,player.h);
+
+for(let b of balls){
+
+ctx.beginPath();
+ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
+ctx.fillStyle="orange";
+ctx.fill();
+
+}
+
+}
+
+function game(){
+
+update();
+draw();
+
+requestAnimationFrame(game);
+
+}
+
+game();
+
+</script>
+
+</body>
+</html>
+
+
+
